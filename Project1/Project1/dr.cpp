@@ -1,130 +1,123 @@
 #include <iostream>
-#include <string>
-#include <vector>
-#include <assert.h>
-#include <math.h>
 #include <cstdlib>
-#include <time.h>
-#include <sstream>
 #include <cstring>
-#include<initializer_list>
+#include <ctime>
+#include <assert.h>
+#include <iomanip> 
+#include <vector>
+#include <sstream>
+#include <algorithm>
+#include <chrono>
+#include <initializer_list>
 
 using namespace std;
 
-//----------------------------------------------------------------------------------------------------------------------------------------
 class Point {
+private:
+	vector<double> coords;
+
 public:
 	Point(initializer_list<double> args) {
-		for (auto iter = args.begin(); iter != args.end(); ++iter)
+		for (auto iter = args.begin(); iter != args.end(); iter++) {
 			push_back(*iter);
+		}
 	}
 
-public:
-	void push_back(double x) { 
-		_pos.push_back(x); 
+public: // overwritten vector methods
+	void push_back(double x) {
+		coords.push_back(x);
 	}
 
-	size_t size() const { 
-		return _pos.size(); 
+	size_t size() const {
+		return coords.size();
 	}
 
-	double& operator[] (const size_t i) { 
-		return _pos[i]; 
+	double& operator[] (const size_t i) {
+		return coords[i];
 	}
 
-	const double operator[] (const size_t i) const { 
-		return _pos[i]; 
+	const double operator[](const size_t i) const {
+		return coords[i];
 	}
 
-public:
-	double EuclidDistanceTo(const Point& other) {
+	double operator- (const Point& other) const {
+		return EuclidDistanceTo(other);
+	}
+
+public: // other methods
+	double EuclidDistanceTo(const Point& Other) const {
 		double square_dist = 0;
-
-		for (int i = 0; i < size(); i++) {
-			square_dist += pow(other[i] - _pos[i], 2);
+		for (size_t i = 0; i < size(); i++) {
+			square_dist += pow(Other[i] - coords[i], 2);
 		}
 
 		return sqrt(square_dist);
 	}
 
-private:
-	vector <double> _pos;
 };
 
-//----------------------------------------------------------------------------------------------------------------------------------------
 class PointArray {
+private:
+	vector<Point> points;
+
 public:
 	PointArray(initializer_list<Point> args) {
-		for (auto iter = args.begin(); iter != args.end(); ++iter) {
+		for (auto iter = args.begin(); iter != args.end(); iter++) {
 			push_back(*iter);
 		}
 	}
 
-public: // redefined vector methods
-	size_t size() const { 
-		return _points.size(); 
+public:
+	size_t dimension() {
+		return (points.size()) ? points[0].size() : 0;
 	}
 
-	Point& operator[] (const size_t i) { 
-		return _points[i]; 
+	size_t size() {
+		return points.size();
 	}
 
-	const Point operator[] (const size_t i) const { 
-		return _points[i]; 
+	Point& operator[] (const size_t i) {
+		return points[i];
 	}
 
-	auto begin() {
-		return _points.begin();
-	}
-
-	auto end() {
-		return _points.end();
+	const Point operator[](const size_t i) const {
+		return points[i];
 	}
 
 	void push_back(Point p) {
-		if (p.size() == dimension() || dimension() == 0) {
-			_points.push_back(p);
-		}
-		else {
-			throw "Points must be same dimension!";
-		}
+		if (p.size() != dimension() && dimension() != 0)
+			throw "Points must have the same dimension";
+
+		points.push_back(p);
 	}
 
-public:
-	vector<Point> get_points() const {
-		return _points;
+	auto begin() {
+		return points.begin();
 	}
 
-	size_t dimension() const { // return dimension of stored points
-		return (size() != 0) ? _points[0].size() : 0;
+	auto end() {
+		return points.end();
 	}
-
-private:
-	vector<Point> _points;
 };
 
-//----------------------------------------------------------------------------------------------------------------------------------------
 class Simplex : private PointArray {
 public:
 	using PointArray::size;
 	using PointArray::operator[];
-	using PointArray::begin;
-	using PointArray::end;
-
-	Simplex(const PointArray& ThePointArray) : PointArray(ThePointArray) {
-		if (ThePointArray.size() - ThePointArray.dimension() != 1) {
-			throw "Object of Simplex-Class must have n+1 points of dimension n!";
-		}
+private:
+	using PointArray::dimension;
+public:
+	Simplex(const PointArray& ThePointArray) : PointArray(ThePointArray) { // call default copy-constructor for PointArray
+		if (size() != dimension() + 1)
+			throw "To create a Simplex object the amount of points has to be 1 more than there dimension!";
 	}
 };
 
-//----------------------------------------------------------------------------------------------------------------------------------------
 class Triangle : public Simplex {
 public:
-	Triangle(const Simplex& TheSimplex) :Simplex(TheSimplex) {
-		if (TheSimplex.size() != 3) {
-			throw "Object of Triangle-Class must have exactly 3 points!";
-		}
+	Triangle(const Simplex &TheSimplex) : Simplex(TheSimplex) {
+		if (size() != 3)
+			throw "Incorrrect Amount of Points to create a Triangle. Should be given 3.";
 	}
 
 public:
@@ -137,10 +130,45 @@ public:
 	}
 };
 
-//----------------------------------------------------------------------------------------------------------------------------------------
-int dr(int argc, char* argv[]) {
-	srand(time(0));
+void test_classes() {
+	Point Eins({ 1.1 });
+	Point Zwei{1.1, 2.2};
+	Point Drei = Point{ 1.1, 2.2, 3.3 };
 
+	PointArray Beide = PointArray{ Zwei, {3.3, 4.4} };
+
+	try {
+		PointArray Feinde = PointArray{ Eins, Zwei };
+	}
+	catch (const char* what) { cout << what << endl; }
+
+	Point ErsterPunkt = Beide[0];
+	double VierKommaVier = Beide[1][1];
+
+	Simplex DerGeht(PointArray{ Point{ 1,2 },Point{ 5,6 },Point{ 8,9 } });
+	try {
+		Simplex DerGehtNicht(PointArray{ Point{ 1,2 },Point{ 5,6 } });
+	}
+	catch (const char* what) { cout << what << endl; }
+
+	Triangle Dreieck(DerGeht);
+	try {
+		Triangle ZweiEck(Beide); // Verhindern!
+		PointArray DreiPunkteIm1DRaum =
+			PointArray{ Point{ 1 },Point{ 2 },Point{ 3 } };
+		Triangle Eindimensional(DreiPunkteIm1DRaum);
+	}
+	catch (const char* what) { cout << what << endl; }
+
+	PointArray DreiPunkteIm2DRaum =
+		PointArray{ Point{ 0, 0 },Point{ 0, 1 },Point{ 1, 0 } };
+	Triangle Zweidimensional(DreiPunkteIm2DRaum);
+	cout << Zweidimensional.Girth() << endl;
+
+}
+
+int main(int argc, char* argv[]) {
+	srand(time(0));
 	try {
 		double x1, y1, x2, y2, x3, y3;
 		if (argc == 1) {
@@ -152,28 +180,29 @@ int dr(int argc, char* argv[]) {
 			y3 = (double)rand() / RAND_MAX;
 		}
 		else if (argc == 7) {
-			if (!(istringstream(argv[1]) >> x1)) throw "Input value must be a number!";
-			if (!(istringstream(argv[1]) >> y1)) throw "Input value must be a number!";
-			if (!(istringstream(argv[1]) >> x2)) throw "Input value must be a number!";
-			if (!(istringstream(argv[1]) >> y2)) throw "Input value must be a number!";
-			if (!(istringstream(argv[1]) >> x3)) throw "Input value must be a number!";
-			if (!(istringstream(argv[1]) >> y3)) throw "Input value must be a number!";
+			if (!(istringstream(argv[1]) >> dec >> x1)) throw "Input value must be a number!";
+			if (!(istringstream(argv[1]) >> dec >> y1)) throw "Input value must be a number!";
+			if (!(istringstream(argv[1]) >> dec >> x2)) throw "Input value must be a number!";
+			if (!(istringstream(argv[1]) >> dec >> y2)) throw "Input value must be a number!";
+			if (!(istringstream(argv[1]) >> dec >> x3)) throw "Input value must be a number!";
+			if (!(istringstream(argv[1]) >> dec >> y3)) throw "Input value must be a number!";
 		}
 		else {
-			throw "Usage: dr [ x1 y1 x2 y2 x3 y3 ] or dr";
+			throw "Usage: dr [ x1 y1 x2 y2 x3 y3 ]";
 		}
 
 		Point a{ x1, y1 };
 		Point b{ x2, y2 };
 		Point c{ x3, y3 };
 
-		Triangle t{ PointArray{a, b, c} };
+		Triangle t{ PointArray{ a, b, c } };
 
 		cout << t.Girth() << endl;
 	}
-	
-	catch (const char* e) {
-		cout << e;
+
+	catch (const char* what) {
+		cerr << what << endl;
+		exit(1);
 	}
 
 	return 0;
