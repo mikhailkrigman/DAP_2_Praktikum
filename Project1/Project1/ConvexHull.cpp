@@ -117,14 +117,6 @@ public:
 		points.pop_back();
 	}
 
-	auto begin() {
-		return points.begin();
-	}
-
-	auto end() {
-		return points.end();
-	}
-
 public:
 	Point min_x(size_t& min_index) const {
 		// Find point with the smallest x - coordinate
@@ -217,7 +209,20 @@ PointArray CalculateHull(const PointArray & AllPoints) {
 		current_index = next_index;
 	} while (current_index != index_of_min_x);
 
-	convex_hull.pop_back(); // the starting point has been appended twice: by initialisation and by the last iteration of do-while loop
+	convex_hull.pop_back(); // the starting point has been appended twice: 
+							// by initialisation and by the last iteration of do-while loop
 
 	return convex_hull;
+}
+
+int main(int argc, char* argv[]) {
+	srand(time(0));
+	try {
+		
+	}
+
+	catch (const char* what) {
+		cerr << what << endl;
+		exit(1);
+	}
 }
