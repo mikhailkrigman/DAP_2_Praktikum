@@ -25,7 +25,12 @@ public:
 
 public: // overwritten vector methods
 	void push_back(double x) {
-		coords.push_back(x);
+		try {
+			coords.push_back(x);
+		}
+		catch(...) {
+			throw "No Memory";
+		}
 	}
 
 	size_t size() const {
@@ -68,11 +73,11 @@ public:
 	}
 
 public:
-	size_t dimension() {
+	size_t dimension() const {
 		return (points.size()) ? points[0].size() : 0;
 	}
 
-	size_t size() {
+	size_t size() const {
 		return points.size();
 	}
 
@@ -88,15 +93,12 @@ public:
 		if (p.size() != dimension() && dimension() != 0)
 			throw "Points must have the same dimension";
 
-		points.push_back(p);
-	}
-
-	auto begin() {
-		return points.begin();
-	}
-
-	auto end() {
-		return points.end();
+		try {
+			points.push_back(p);
+		}
+		catch (...) {
+			throw "No Memory";
+		}
 	}
 };
 
@@ -167,7 +169,7 @@ void test_classes() {
 
 }
 
-int main(int argc, char* argv[]) {
+int main1(int argc, char* argv[]) {
 	srand(time(0));
 	try {
 		double x1, y1, x2, y2, x3, y3;
