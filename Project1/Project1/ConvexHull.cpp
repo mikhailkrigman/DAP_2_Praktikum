@@ -49,6 +49,21 @@ public: // overwritten vector methods
 		return this->EuclidDistanceTo(other);
 	}
 
+	bool operator== (const Point& other) const {
+		if (this->size() != other.size()) return false;
+
+		for (size_t i = 0; i < size(); i++) {
+			if (coords[i] != other[i])
+				return false;
+		}
+
+		return true;
+	}
+
+	bool operator!= (const Point& other) const {
+		return !((*this) == other);
+	}
+
 	Point& operator= (const Point& other) {
 		if (this == &other) return *this;
 
@@ -59,6 +74,16 @@ public: // overwritten vector methods
 			throw "No Memory";
 		}
 		return *this;
+	}
+
+	friend ostream& operator<< (ostream& TheOstream, const Point& point) {
+		TheOstream << "(" << fixed << setprecision(6);
+		for (size_t i = 0; i < point.size() - 1; i++) {
+			TheOstream << point[i] << ", ";
+		}
+		TheOstream << point[point.size() - 1] << ")";
+
+		return TheOstream;
 	}
 
 public: // other methods
@@ -117,6 +142,14 @@ public:
 		points.pop_back();
 	}
 
+	friend ostream& operator<< (ostream& TheOstream, const PointArray& point_array) {
+		TheOstream << "Set of " << point_array.size() << " Points is:";
+		for (size_t i = 0; i < point_array.size(); i++) {
+			TheOstream << endl << point_array[i];
+		}
+
+		return TheOstream;
+	}
 public:
 	Point min_x(size_t& min_index) const {
 		// Find point with the smallest x - coordinate
@@ -141,7 +174,7 @@ public:
 	using PointArray::operator[];
 
 public:
-	Line(const Point& P1, const Point& P2): PointArray({ P1,P2 }) { ; }
+	Line(const Point& P1, const Point& P2) : PointArray({ P1,P2 }) { ; }
 
 public:
 	double Length() {
@@ -149,7 +182,7 @@ public:
 	}
 
 	int get_orientation(const Point& point) {
-		// determines the orientation of way (*this)[0] --> (*this)[1] --> point
+		// determine the orientation of way (*this)[0] --> (*this)[1] --> point
 
 		//  1 == clockwise == point is right of vector <(*this)[0], (*this)[1]> or it's prolongation
 		// -1 == counterclockwise == point is left of vector <(*this)[0], (*this)[1]> or it's prolongation
@@ -159,7 +192,7 @@ public:
 		double orientation = ((*this)[1][1] - (*this)[0][1]) * (point[0] - (*this)[1][0])
 			- ((*this)[1][0] - (*this)[0][0]) * (point[1] - (*this)[1][1]);
 
-		return (int)(orientation / abs(orientation));
+		return (abs(orientation) == 0) ? 0 : (int)(orientation / abs(orientation));
 	}
 };
 
@@ -183,14 +216,12 @@ size_t get_index_of_the_leftmost_point(const PointArray& all_points, const size_
 				the_leftmost_point_index = i;
 			}
 		}
-
-		// eventually add check for duplicate point
 	}
 
 	return the_leftmost_point_index;
 }
 //----------------------------------------------------------------------------------------------------------------------------------------
-PointArray CalculateHull(const PointArray & AllPoints) {
+PointArray CalculateHull(const PointArray& AllPoints) {
 	if (AllPoints.size() < 3)
 		throw "Convex Hull can be made with at least 3 points!";
 
@@ -207,18 +238,70 @@ PointArray CalculateHull(const PointArray & AllPoints) {
 		convex_hull.push_back(AllPoints[next_index]);
 
 		current_index = next_index;
-	} while (current_index != index_of_min_x);
+	} while (convex_hull[0] != convex_hull[convex_hull.size() - 1]); 
+	// comparison with point coordinates makes it easy to avoid duplicate points 
+	// and does not require additional checks in the index search function
 
 	convex_hull.pop_back(); // the starting point has been appended twice: 
-							// by initialisation and by the last iteration of do-while loop
+							// by the initialisation and by the last iteration of do-while loop
 
 	return convex_hull;
 }
+//----------------------------------------------------------------------------------------------------------------------------------------
+PointArray generate_random_points(size_t length, size_t point_dimension) {
+	PointArray new_point_array{};
+
+	for (size_t i = 0; i < length; i++) {
+		Point new_point{};
+		for (size_t j = 0; j < point_dimension; j++) {
+			new_point.push_back((double)rand() / RAND_MAX);
+		}
+
+		new_point_array.push_back(new_point);
+	}
+
+	return new_point_array;
+}
+
 
 int main(int argc, char* argv[]) {
 	srand(time(0));
 	try {
-		
+		if (argc < 2 || (argc > 2 && argc % 2 == 0))
+			throw "Usage: ConvexHull n | { x1 y1 x2 y2 x3 y3 ... }";
+
+		else {
+			PointArray points{};
+
+			if (argc == 2) {
+				int n; // cast to size_t later, because if n is not integer program can't check if n < 0
+				if (!(istringstream(argv[1]) >> dec >> n) || n <= 0)
+					throw "Parameter n must be positive Integer.";
+
+				points = PointArray{generate_random_points(static_cast<size_t>(n), 2)};
+			}
+			else {
+				double x, y;
+				for (size_t i = 1; i < argc - 1; i += 2) {
+					// use bitwise operator & to check if coords are numbers
+					if ((bool)( (bool)(!(istringstream(argv[i]) >> dec >> x)) &
+								(bool)(!(istringstream(argv[i + 1]) >> dec >> y))))
+						throw "Parameters { x1 y1 x2 y2 x3 y3 ... } must be numbers.";
+
+					Point new_point{ x, y };
+					points.push_back(new_point);
+				}
+			}
+
+			cout << points << endl;
+			if (points.size() < 2)
+				throw "Hull needs at least 2 Points to build";
+
+			// assign operator is not overloaded, so better way is to use class constructor 
+			PointArray convex_hull{ CalculateHull(points) };
+			cout << endl << "Convex Hull is build clockwise form the " << convex_hull.size() << " following Points:"
+				<< endl << convex_hull << endl;
+		}
 	}
 
 	catch (const char* what) {
