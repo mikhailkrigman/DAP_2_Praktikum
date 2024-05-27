@@ -42,11 +42,10 @@ public:
 		return this->SecondTime < other.SecondTime;
 	}
 };
-
+//-----------------------------------------------------------------------------------------------
 class JobVector : private vector<JobSpecification> {
 public:
 	using vector<JobSpecification>::size;
-	using vector<JobSpecification>::push_back;
 	using vector<JobSpecification>::erase;
 	using vector<JobSpecification>::begin;
 	using vector<JobSpecification>::end;
@@ -89,12 +88,7 @@ public:
 				}
 
 				JobSpecification new_job(first_time, second_time);
-				try {
-					push_back(new_job);
-				}
-				catch (...) {
-					throw "No memory.";
-				}
+				push_back(new_job);
 			}
 
 			if (size() == 0) throw "Nothing usable in file.";
@@ -103,6 +97,15 @@ public:
 	}
 
 public:
+	void push_back(JobSpecification& job) {
+		try {
+			vector<JobSpecification>::push_back(job);
+		}
+		catch (...) {
+			throw "No memory.";
+		}
+	}
+
 	friend ostream& operator<< (ostream& os, const JobVector& jobs) {
 		os << "List of " << jobs.size() << " Jobs is:";
 		for (size_t i = 0; i < jobs.size(); i++) {
@@ -114,6 +117,17 @@ public:
 
 };
 
+//-----------------------------------------------------------------------------------------------
+JobVector IntervalScheduling(JobVector Jobs) {
+	sort(Jobs.begin(), Jobs.end());
+	return JobVector();
+}
+//-----------------------------------------------------------------------------------------------
+JobVector LatenessScheduling(JobVector Jobs) {
+	sort(Jobs.begin(), Jobs.end());
+	return JobVector();
+}
+//-----------------------------------------------------------------------------------------------
 int main(int argc, char* argv) {
 	string filenames[] = { "datenBsp1.zahlen", "Err1", "Err2", "Err3", "Err4", "Err5", "Err6" };
 	for (auto filename : filenames) {
