@@ -38,7 +38,7 @@ public:
 		return SecondTime;
 	}
 
-	bool operator< (JobSpecification other) {
+	bool operator< (const JobSpecification& other) {
 		return this->SecondTime < other.SecondTime;
 	}
 };
