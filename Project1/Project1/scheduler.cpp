@@ -97,7 +97,7 @@ public:
 	}
 
 public:
-	void push_back(JobSpecification& job) {
+	void push_back(const JobSpecification& job) {
 		try {
 			vector<JobSpecification>::push_back(job);
 		}
