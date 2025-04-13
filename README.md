@@ -1,21 +1,39 @@
-# 🇷🇺 Добро пожаловать
+# 🌍 Проект
 
-| 🌍 Язык | Перейти |
-|--------|---------|
-| 🇷🇺 **Русский** | 🟢 Вы здесь |
-| 🇬🇧 [English](docs/README.en.md) | 🔗 |
-| 🇪🇸 [Español](docs/README.es.md) | 🔗 |
+Ниже вы можете выбрать язык:
 
----
+<details open>
+  <summary>🇷🇺 Русский</summary>
 
-Это описание проекта на русском языке.
+  Добро пожаловать!  
+  Это описание проекта на русском языке.
 
-- 📦 Возможности
-- ⚙️ Установка
-- 📄 Документация
+  - 📦 Возможности  
+  - ⚙️ Установка  
+  - 📄 Документация
 
-...
+</details>
 
----
+<details>
+  <summary>🇬🇧 English</summary>
 
-🔄 [Сменить язык](#язык)
+  Welcome!  
+  This is the project description in English.
+
+  - 📦 Features  
+  - ⚙️ Installation  
+  - 📄 Documentation
+
+</details>
+
+<details>
+  <summary>🇪🇸 Español</summary>
+
+  ¡Bienvenido!  
+  Esta es la descripción del proyecto en español.
+
+  - 📦 Características  
+  - ⚙️ Instalación  
+  - 📄 Documentación
+
+</details>
