@@ -1,39 +1,26 @@
-# 🌍 Проект
+# 🌍 Многоязычное описание проекта
 
-Ниже вы можете выбрать язык:
+## 📑 Оглавление / Table of Contents
+
+- [🇷🇺 Русский](#русский)
+- [🇬🇧 English](#english)
+- [🇪🇸 Español](#español)
+
+---
 
 <details open>
-  <summary>🇷🇺 Русский</summary>
+<summary id="русский">🇷🇺 Русский</summary>
 
-  Добро пожаловать!  
-  Это описание проекта на русском языке.
+### Добро пожаловать
 
-  - 📦 Возможности  
-  - ⚙️ Установка  
-  - 📄 Документация
+Это описание проекта на русском языке.
 
-</details>
+- 📦 Возможности
+- ⚙️ Установка
+- 📄 Документация
 
-<details>
-  <summary>🇬🇧 English</summary>
+Пример использования:
 
-  Welcome!  
-  This is the project description in English.
-
-  - 📦 Features  
-  - ⚙️ Installation  
-  - 📄 Documentation
-
-</details>
-
-<details>
-  <summary>🇪🇸 Español</summary>
-
-  ¡Bienvenido!  
-  Esta es la descripción del proyecto en español.
-
-  - 📦 Características  
-  - ⚙️ Instalación  
-  - 📄 Documentación
-
-</details>
+```bash
+npm install
+npm run start
